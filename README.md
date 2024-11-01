@@ -14,4 +14,4 @@ This functionality involves automating the user login and then navigating to sel
 Course availability data is scraped separately from USF Staff Schedule Search site.
 
 ## Front-End
-Integration of functionality in development.
+Integration of Front-End in development with Django.
