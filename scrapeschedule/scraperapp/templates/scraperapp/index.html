@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USF-CA</title>
+    <link rel="stylesheet" href="../static/styles/main.css"><link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..1000&display=swap" rel="stylesheet">
+    <nav>
+        <div class="navsec" id="ns-left">Get Notified</div>
+        <div class="navbtn">
+            <img src="https://img.icons8.com/sf-black-filled/100/create-new.png" alt="create-new"/>
+            <div class="navBSels">
+                <div class="navBSel" onclick="addNewCourse()">Add New</div>
+                <div class="navBSel">Edit Current</div>
+            </div>
+        </div>
+        <div class="navsec" id="ns-right">Auto-Enroll</div>
+    </nav>
+</head>
+<body>
+    <div class="viewcontainer">
+        <ul class="listview inactiveView">
+            <li>Class 1</li>
+            <li>Class 2</li>
+            <li>Class 3</li>
+        </ul>
+        <div class="emptyView">
+            <h3 onclick="addNewCourse()">Get Started by Adding a New Course</h3>
+        </div>
+        <div class="addCourseView inactiveView">
+            <div class="searchBar">
+                <img src="../static/assets/icons/search.svg" alt="search icon">
+                <div class="searchIn">
+                    <div class="searchCaret"></div>
+                    <input type="text" placeholder="Search Course with Course Registration Number">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    const navbtn = document.getElementsByClassName("navbtn")[0];
+    const navBSels = document.getElementsByClassName("navBSels")[0];
+
+    let nbtnActive = false;
+
+    document.addEventListener('click', (event) => {
+        if (navbtn.contains(event.target)) {
+            newState = !nbtnActive; // Toggle the active nbtnActive
+        } else {
+            newState = false;
+        }
+
+        if (newState) {
+            navBSels.classList.add('navBSels-active'); // Add active class
+        } else if (nbtnActive) {
+            navBSels.classList.remove('navBSels-active'); // Remove active class
+        }
+
+        nbtnActive = newState;
+
+    });
+
+    function addNewCourse() {
+        const viewcontainer = document.getElementsByClassName("viewcontainer")[0];
+        const addCourseView = document.getElementsByClassName("addCourseView")[0];
+        const children = viewcontainer.children; // Get all children of the parent
+
+        for (let i = 0; i < children.length; i++) {
+            if (!children[i].classList.contains("inactiveView") && children[i] != addCourseView) { // Check if the class is not already present
+                children[i].classList.add("inactiveView"); // Add the class
+            }
+        }
+
+        while (addCourseView.classList.contains("inactiveView")) {
+            addCourseView.classList.remove("inactiveView");
+        }
+    }
+
+    const input = document.getElementsByClassName('searchIn')[0].getElementsByTagName("input")[0];
+    const caret = document.querySelector('.searchCaret');
+
+    input.addEventListener('input', updateCaret);
+
+    function updateCaret(e) {
+
+        if (input.value === '') {
+            caret.style.display = 'block';
+            input.style.caretColor = 'transparent';
+        }
+            
+        // else {
+        //     caret.style.left = // update caret to be current left position + 10 px
+        // }
+
+        else {
+            caret.style.display = 'none';
+            input.style.caretColor = '#333333';
+        }
+    }
+
+    input.addEventListener('keydown', searchCourse);
+
+    function searchCourse(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent default action
+
+            const inputValue = input.value;
+
+            fetch('/scrape/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ input: inputValue })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message); // Handling response
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    }
+
+</script>
